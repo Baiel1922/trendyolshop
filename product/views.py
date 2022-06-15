@@ -2,20 +2,21 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, generics
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.generics import CreateAPIView, ListCreateAPIView,RetrieveDestroyAPIView, ListAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from account.permissions import IsAuthorPermission, IsActivePermission
 from rest_framework.views import APIView
+from collections import OrderedDict
 from django.db.utils import IntegrityError
 from time import time
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import ProductFilter
 from .models import *
 from .serializers import *
-from parsers import TrendyolScraper, Scraper
+from parsers import TrendyolScraper, Scraper, UpdateProduct
 
 
 class PermissionMixin:
@@ -34,6 +35,24 @@ class LargeResultsSetPagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     max_page_size = 100
 
+    def get_paginated_response(self, data):
+        all_id = [i["id"] for i in data]
+        updated_p_result = {}
+        result_lst = []
+        for id in all_id:
+            update = UpdateProduct()
+            updated_p_result[id] = update.update_product_from_id(id)
+            if updated_p_result[id]:
+                product_obj = Product.objects.get(pk=id)
+                serializer = ProductSerializer(product_obj)
+                result_lst.append(serializer.data)
+        print(updated_p_result)
+        return Response(OrderedDict([
+            ('count', self.page.paginator.count),
+            ('next', self.get_next_link()),
+            ('previous', self.get_previous_link()),
+            ('results', result_lst)
+        ]))
 
 class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()

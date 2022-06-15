@@ -109,7 +109,7 @@ class Review2(models.Model):
 
 
 class Image(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images', default="b@gmail.com")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     image = models.ImageField(upload_to='images', max_length=1000)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
 
