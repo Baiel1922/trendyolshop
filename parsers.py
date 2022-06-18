@@ -33,6 +33,7 @@ class Scraper:
         with open('output/brands.json') as f:
             brands_json = json.load(f)
         for brand in brands_json:
+            print(brand)
             name = brand['name']
             slug = brand['slug']
             Brand.objects.update_or_create(slug=slug, defaults={'brand': name})
@@ -87,10 +88,10 @@ class Scraper:
         count_added_products = 0
         count_product_size = 0
         scraper = TrendyolScraper()
-        all_products = scraper.get_all_products()
-        # with open('output/products.json') as f:
-        #     products_json = json.load(f)
-        for product in all_products:
+        all_products = scraper.get_all_products(write2file=True)
+        with open('output/products.json') as f:
+            products_json = json.load(f)
+        for product in products_json:
             id = product["id"]
             name = product["name"]
             link = product["link"]

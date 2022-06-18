@@ -468,7 +468,7 @@ class TrendyolScraper:
                 # for page in range(208 + 1)  # JUST FOR TEST
                 # for category in end_categories  # JUST FOR TEST
                 for page in range(208 + 1)  # JUST FOR TEST
-                for category in end_categories[:len(end_categories)]  # JUST FOR TEST
+                for category in end_categories[:len(end_categories) // 2]  # JUST FOR TEST
             ]
 
             await asyncio.gather(*tasks)
