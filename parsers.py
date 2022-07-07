@@ -122,12 +122,13 @@ class Scraper:
                 Category.objects.create(slug=category_slug, title=category_slug)
                 category = Category.objects.get(slug=category_slug)
                 count_category += 1
-            show_size_slug = product["showSize"].lower()
+            show_size_slug = product["showSize"]
+            size_slug = show_size_slug.lower()
             try:
-                show_size = SizeL.objects.get(slug=show_size_slug)
+                show_size = SizeL.objects.get(slug=size_slug)
             except:
-                SizeL.objects.create(slug=show_size_slug, name=show_size_slug.upper())
-                show_size = SizeL.objects.get(slug=show_size_slug)
+                SizeL.objects.create(slug=size_slug, name=show_size_slug)
+                show_size = SizeL.objects.get(slug=size_slug)
                 count_size += 1
             try:
                 Product.objects.create(id=id,
