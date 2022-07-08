@@ -248,7 +248,7 @@ class Scraper:
                     try:
                         value = SizeL.objects.get(slug=value_slug)
                     except:
-                        SizeL.objects.create(slug=value_slug, name=value.upper())
+                        SizeL.objects.create(slug=value_slug, name=value_slug.upper())
                         value = SizeL.objects.get(slug=value_slug)
                         count_size += 1
                     in_stock = size["inStock"]

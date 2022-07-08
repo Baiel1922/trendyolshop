@@ -6,6 +6,7 @@ import ujson, asyncio, aiohttp
 
 from time import time
 
+
 # TODO: MAKE FULL ASYNCHRONOMOUS get_all_categories []
 # TODO: DRY AND REFACTOR
 # TODO: OPTIMIZE 1
@@ -146,8 +147,8 @@ class TrendyolScraper:
 
     def get_products_api(self, link, page=0):
         url = (
-            "https://public.trendyol.com/discovery-web-searchgw-service/v2/api/infinite-scroll"
-            + link
+                "https://public.trendyol.com/discovery-web-searchgw-service/v2/api/infinite-scroll"
+                + link
         )
         if page != 0:
             return url + f"?pi={page}"
@@ -185,11 +186,11 @@ class TrendyolScraper:
 
     async def fetch_len_of_products_reviews(self, session, id):
         async with session.get(
-            self.get_product_reviews_api(
-                id,
-                0,
-            ),
-            headers=headers,
+                self.get_product_reviews_api(
+                    id,
+                    0,
+                ),
+                headers=headers,
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -209,7 +210,7 @@ class TrendyolScraper:
             return []
 
         async with session.get(
-            self.get_product_reviews_api(id, 0, size), headers=headers
+                self.get_product_reviews_api(id, 0, size), headers=headers
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -225,7 +226,7 @@ class TrendyolScraper:
                         "comment": review["comment"],
                         "date": review["lastModifiedDate"],
                     }
-                    for review in reviews
+                    for review in reviews[:20]
                 ]
             except:
                 return []
@@ -241,7 +242,7 @@ class TrendyolScraper:
 
     async def fetch_cross_products_id(self, session, id):
         async with session.get(
-            self.get_reccomendations_api(id, "/cross"), headers=headers
+                self.get_reccomendations_api(id, "/cross"), headers=headers
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -254,7 +255,7 @@ class TrendyolScraper:
 
     async def fetch_recommendation_products_id(self, session, id):
         async with session.get(
-            self.get_reccomendations_api(id, "/recommendation"), headers=headers
+                self.get_reccomendations_api(id, "/recommendation"), headers=headers
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -267,7 +268,7 @@ class TrendyolScraper:
 
     async def fetch_product_attributes(self, session, raw_product):
         async with session.get(
-            self.get_products_group_api(raw_product["productGroupId"]), headers=headers
+                self.get_products_group_api(raw_product["productGroupId"]), headers=headers
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -347,17 +348,18 @@ class TrendyolScraper:
                         ]
                     ),
                     # "reviews": await self.fetch_product_reviews(session, id),
+                    "reviews": [],
                     "questions": [],
-                    # "recommendations": await self.fetch_recommendation_products_id(
-                    #     session, id
-                    # ),
-                    # "cross": await self.fetch_cross_products_id(session, id),
+                    "recommendations": await self.fetch_recommendation_products_id(
+                        session, id
+                    ),
+                    "cross": await self.fetch_cross_products_id(session, id),
                 }
 
                 return final
 
             except Exception as e:
-                print(f"Error: {id}\n")
+                print(f"\nError: {id}\n")
 
         # except IndexError:
         #     print(self.get_product_api(id))
@@ -405,9 +407,9 @@ class TrendyolScraper:
     async def fetch_all_products_from_link(self, session, link, page):
         try:
             async with session.get(
-                self.get_products_api(link, page),
-                headers=headers,
-                timeout=20,
+                    self.get_products_api(link, page),
+                    headers=headers,
+                    timeout=20,
             ) as response:
                 data = ujson.loads(await response.text())
 
@@ -419,7 +421,7 @@ class TrendyolScraper:
                 print(f"\nLink: {link}\nPage: {page + 1}")
 
         except asyncio.TimeoutError:
-            print(f"\nFAILED Link: {link}\nPage: {page + 1}")
+            print(f"\nFAILED TO PROCESS Link: {link}\nPage: {page + 1}")
 
 
         # except aiohttp.ClientConnectionError:
@@ -429,15 +431,15 @@ class TrendyolScraper:
         # except aiohttp.client_exceptions.ClientPayloadError:
         #     pass
 
-        # except Exception as e:
-        #     print(f"\nFAILED TO PROCESS Link: {link}\nPage: {page + 1}")
+        except Exception as e:
+            print(f"\nFAILED Link: {link}\nPage: {page + 1}")
 
-        #     MyUtils.create_folder("output")
-        #     MyUtils.create_folder("output/error")
-        #     MyUtils.create_file("output/error/trace_back.txt", str(e))
-        #     MyUtils.create_file(
-        #         "output/error/products.json", ujson.dumps(self.all_products)
-        #     )
+            # MyUtils.create_folder("output")
+            # MyUtils.create_folder("output/error")
+            # MyUtils.create_file("output/error/trace_back.txt", str(e))
+            # MyUtils.create_file(
+            #     "output/error/products.json", ujson.dumps(self.all_products)
+            # )
 
         # Review
         # self.pages_processed += 1
@@ -469,7 +471,7 @@ class TrendyolScraper:
 
         connector = aiohttp.TCPConnector(limit=50)
         async with aiohttp.ClientSession(connector=connector) as session:
-        # async with aiohttp.ClientSession() as session:
+            # async with aiohttp.ClientSession() as session:
             self.total = len(end_categories) * 208
 
             tasks = [
@@ -497,9 +499,10 @@ class TrendyolScraper:
         print("\nStarting parsing products")
         print("Processed: ")
 
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(self.fetch_all_products())
-        loop.close()
+        # loop = asyncio.get_event_loop()
+        # loop.run_until_complete(self.fetch_all_products())
+
+        asyncio.run(self.fetch_all_products())
 
         if write2file:
             MyUtils.create_folder("output")
@@ -532,7 +535,7 @@ class TrendyolScraper:
 
     async def get_colors_from_link(self, session, link):
         async with session.get(
-            self.aggregations_api + link, headers=headers
+                self.aggregations_api + link, headers=headers
         ) as response:
             data = ujson.loads(await response.text())
 
@@ -575,7 +578,7 @@ class TrendyolScraper:
 
     async def get_sizes_from_link(self, session, link):
         async with session.get(
-            self.aggregations_api + link, headers=headers
+                self.aggregations_api + link, headers=headers
         ) as response:
             data = ujson.loads(await response.text())
 
@@ -617,7 +620,7 @@ class TrendyolScraper:
 
     async def get_brands_from_link(self, session, link):
         async with session.get(
-            self.aggregations_api + link, headers=headers
+                self.aggregations_api + link, headers=headers
         ) as response:
             data = ujson.loads(await response.text())
 
@@ -660,7 +663,7 @@ class TrendyolScraper:
 
     async def get_categories_from_link(self, session, link):
         async with session.get(
-            self.aggregations_api + link, headers=headers
+                self.aggregations_api + link, headers=headers
         ) as response:
             try:
                 data = ujson.loads(await response.text())
@@ -735,13 +738,8 @@ def main():
 
     start_time = time()
 
-    # scraper.get_all_categories(write2file=True)
-    # scraper.get_all_brands(write2file=True)
-    # scraper.get_all_colors(write2file=True)
-    # scraper.get_all_sizes(write2file=True)
-    print(len(scraper.get_all_products(write2file=True)))
-
-    # scraper.get_product_from_id(id=234437877)
+    all_products = scraper.get_all_products(write2file=True)
+    print(len(all_products))
 
     print(time() - start_time)
 
@@ -749,5 +747,11 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+# TODO: Solve errors
+# 42631817
+# 234437877
+# 44060293
 # 158237684
+# /kadin-bustiyer-x-g1-c74
+# /kadin-tesettur-salopet-x-g1-c105835
+# /erkek-buyuk-beden-sort-x-g2-c108870
