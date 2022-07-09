@@ -478,8 +478,8 @@ class TrendyolScraper:
                 self.fetch_all_products_from_link(session, category["link"], page)
                 # for page in range(208 + 1)  # JUST FOR TEST
                 # for category in end_categories  # JUST FOR TEST
-                for page in range(208 + 1)  # JUST FOR TEST
-                for category in end_categories  # JUST FOR TEST
+                for page in range(5)  # JUST FOR TEST
+                for category in end_categories[3:5] # JUST FOR TEST
             ]
 
             await asyncio.gather(*tasks)
